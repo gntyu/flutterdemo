@@ -1,132 +1,104 @@
-// Step 4: Create an infinite scrolling lazily loaded list
+import 'dart:async';
 
-import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
-import './utils/HttpUtils.dart';
+import 'package:flutterdemo/common/redux/gsy_state.dart';
+import 'package:flutterdemo/common/model/User.dart';
+import 'package:flutterdemo/page/home.dart';
+import 'package:flutterdemo/page/welcome.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
-Dio dio = new Dio();
-
-void main() => runApp(new MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Startup Name Generator',
-      // debugShowMaterialGrid:true,
-      home: new RandomWords(),
-      theme: new ThemeData(
-        primaryColor: Colors.black,
-      ),
-    );
-  }
+void main() {
+  runZoned(() {
+    runApp(FlutterReduxApp());
+    PaintingBinding.instance.imageCache.maximumSize = 100;
+  }, onError: (Object obj, StackTrace stack) {
+    print(obj);
+    print(stack);
+  });
 }
 
-class RandomWords extends StatefulWidget {
-  @override
-  createState() => new RandomWordsState();
-}
+class FlutterReduxApp extends StatelessWidget {
+  /// 创建Store，引用 GSYState 中的 appReducer 实现 Reducer 方法
+  /// initialState 初始化 State
+  final store = new Store<GSYState>(
+    appReducer,
+    middleware: middleware,
 
-class RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = new Set();
-  final TextStyle _biggerFont = new TextStyle(
-    fontSize: 18.0,
-    fontFamily: 'RobotoMono',
+    ///初始化数据
+    initialState: new GSYState(userInfo: User.empty()),
   );
-  final TextStyle _blueFont = new TextStyle(fontSize: 18.0, color: Colors.blue);
-  void _pushSaved() {
-    Navigator.of(context).push(
-      new MaterialPageRoute(
-        builder: (context) {
-          final tiles = _saved.map(
-            (one) {
-              return new ListTile(
-                title: new Text(
-                  one,
-                  style: _blueFont,
-                ),
-              );
-            },
-          );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
-          return new Scaffold(
-            appBar: new AppBar(
-              title: new Text('新路由'),
-            ),
-            body: new ListView(children: divided),
-          );
-        },
-      ),
-    );
-  }
 
-  void getHttp() async {
-    try {
-      var result = await HttpUtil().get('/login');
-      print(result);
-    } catch (e) {
-      print(e);
-    }
-  }
+  FlutterReduxApp({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('姓名生成器'),
-        actions: <Widget>[
-          new IconButton(
-              icon: new Icon(Icons.favorite, color: Colors.red),
-              onPressed: _pushSaved),
-        ],
-      ),
-      body: _buildSuggestions(),
+    /// 通过 StoreProvider 应用 store
+    return new StoreProvider(
+      store: store,
+      child: new StoreBuilder<GSYState>(builder: (context, store) {
+        return new MaterialApp(
+            theme: new ThemeData(
+              primaryColor: Colors.black,
+            ),
+            routes: {
+              WelcomePage.sName: (context) {
+                return WelcomePage();
+              },
+              HomePage.sName: (context) {
+                ///通过 Localizations.override 包裹一层，
+                return new HomePage();
+              }
+              // LoginPage.sName: (context) {
+              //   return new LoginPage();
+              // },
+            });
+      }),
     );
   }
+}
 
-  Widget _buildSuggestions() {
-    return new ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context, i) {
-        if (i.isOdd) return new Divider();
+class GSYLocalizations extends StatefulWidget {
+  final Widget child;
 
-        final index = i ~/ 2;
-        if (index >= _suggestions.length) {
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[index], index);
-      },
-    );
+  GSYLocalizations({Key key, this.child}) : super(key: key);
+
+  @override
+  State<GSYLocalizations> createState() {
+    return new _GSYLocalizations();
+  }
+}
+
+class _GSYLocalizations extends State<GSYLocalizations> {
+  StreamSubscription stream;
+
+  @override
+  Widget build(BuildContext context) {
+    return new StoreBuilder<GSYState>(builder: (context, store) {
+      ///通过 StoreBuilder 和 Localizations 实现实时多语言切换
+      return new Localizations.override(
+        context: context,
+        // locale: store.state.locale,
+        // child: widget.child,
+      );
+    });
   }
 
-  Widget _buildRow(WordPair pair, int inx) {
-    final String _one = (inx + 1).toString() + ". " + pair.asPascalCase;
-    final alreadySaved = _saved.contains(_one);
-    return new ListTile(
-      title: new Text(
-        _one,
-        style: _biggerFont,
-      ),
-      trailing: new Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : Colors.black,
-      ),
-      onTap: () {
-        print(_one);
-        getHttp();
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(_one);
-          } else {
-            _saved.add(_one);
-          }
-        });
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    // stream = Code.eventBus.on<HttpErrorEvent>().listen((event) {
+    //   errorHandleFunction(event.code, event.message);
+    // });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (stream != null) {
+      stream.cancel();
+      stream = null;
+    }
   }
 }
