@@ -1,8 +1,5 @@
-/**
- * Created by guoshuyu
- * Date: 2018-08-15
- */
-abstract class GSYStringBase {
+
+abstract class LYStringBase {
   String welcomeMessage;
 
   String app_name;

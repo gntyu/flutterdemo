@@ -4,8 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutterdemo/page/name.dart';
 import 'package:flutterdemo/page/profile.dart';
+import 'package:flutterdemo/page/customer.dart';
 import 'package:flutterdemo/widget/ly_tabbar_widget.dart';
-import 'package:flutterdemo/common/style/gsy_style.dart';
+import 'package:flutterdemo/common/style/ly_style.dart';
 
 class HomePage extends StatelessWidget {
   static final String sName = "home";
@@ -36,8 +37,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabs = [
-      _renderTab(GSYICons.MAIN_DT, "name"),
-      _renderTab(GSYICons.MAIN_QS, "profile"),
+      _renderTab(LYICons.HOME, "name"),
+      _renderTab(LYICons.MORE, "customer"),
+      _renderTab(LYICons.SEARCH, "profile"),
     ];
     return WillPopScope(
       onWillPop: () {
@@ -45,17 +47,19 @@ class HomePage extends StatelessWidget {
       },
       child: new LYTabBarWidget(
         // drawer: new HomeDrawer(),
-        // type: GSYTabBarWidget.BOTTOM_TAB,
+        // type: LYTabBarWidget.BOTTOM_TAB,
         tabItems: tabs,
         tabViews: [
           new NamePage(),
+          new CustomerPage(),
           new ProfilePage(),
         ],
-        // backgroundColor: GSYColors.primarySwatch,
-        // indicatorColor: Color(GSYColors.white),
-        // title: GSYTitleBar(
-        //   GSYLocalizations.of(context).currentLocalized.app_name,
-        //   iconData: GSYICons.MAIN_SEARCH,
+        title:new Text("global")
+        // backgroundColor: LYColors.primarySwatch,
+        // indicatorColor: Color(LYColors.white),
+        // title: LYTitleBar(
+        //   LYLocalizations.of(context).currentLocalized.app_name,
+        //   iconData: LYICons.MAIN_SEARCH,
         //   needRightLocalIcon: true,
         //   onPressed: () {
         //     NavigatorUtils.goSearchPage(context);

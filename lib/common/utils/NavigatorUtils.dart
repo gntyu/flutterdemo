@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterdemo/page/home.dart';
 import 'package:flutterdemo/page/profile.dart';
+import 'package:flutterdemo/page/details.dart';
 
 
 class NavigatorUtils {
@@ -17,19 +18,30 @@ class NavigatorUtils {
   }
 
   //路由跳转
-  static NavigatorRouter(BuildContext context, Widget widget) {
+  static pushCupertino(BuildContext context, Widget widget) {
     return Navigator.push(
         context, new CupertinoPageRoute(builder: (context) => widget));
   }
 
-  ///主页
+  //路由跳转
+  static pushMaterial(BuildContext context, Widget widget) {
+    return Navigator.push(
+        context, new MaterialPageRoute(builder: (context) => widget));
+  }
+
+  //主页
   static goHome(BuildContext context) {
     Navigator.pushReplacementNamed(context, HomePage.sName);
   }
 
-  ///个人信息
+  //个人信息
   static goProfile(BuildContext context) {
-    NavigatorRouter(context, new ProfilePage());
+    pushCupertino(context, new ProfilePage());
+  }
+
+  //详情
+  static goProfileDetails(BuildContext context) {
+    pushMaterial(context, new DetailsPage());
   }
 
   ///登录页

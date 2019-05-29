@@ -51,7 +51,7 @@ class _NamePageState extends State<NamePage> {
 
   void getHttp() async {
     try {
-      var result = await HttpUtil().get('/login');
+      var result = await HttpUtil().get('/kpi-management/login');
       print(result);
     } catch (e) {
       print(e);

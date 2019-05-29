@@ -1,15 +1,12 @@
-import 'package:flutterdemo/common/style/gsy_string_base.dart';
+import 'package:flutterdemo/common/style/ly_string_base.dart';
 
-/**
- * Created by guoshuyu
- * Date: 2018-08-15
- */
-class GSYStringEn extends GSYStringBase {
+
+class LYStringEn extends LYStringBase {
   @override
   String welcomeMessage = "Welcome To Flutter";
 
   @override
-  String app_name = "GSYGithubAppFlutter";
+  String app_name = "LYGithubAppFlutter";
 
   @override
   String app_ok = "ok";
@@ -45,7 +42,7 @@ class GSYStringEn extends GSYStringBase {
   @override
   String option_web_launcher_error = "url error";
   @override
-  String option_share_title = "share form GSYGitHubFlutter： ";
+  String option_share_title = "share form LYGitHubFlutter： ";
   @override
   String option_share_copy_success = "Copy Success";
 
